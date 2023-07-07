@@ -41,6 +41,7 @@ import { shouldShowComponent } from "../../../customisations/helpers/UIComponent
 import { UIComponent } from "../../../settings/UIFeature";
 import PosthogTrackers from "../../../PosthogTrackers";
 import { ViewRoomPayload } from "../../../dispatcher/payloads/ViewRoomPayload";
+import { getSpacePinKey } from "../../../stores/spaces/SpaceStore";
 
 interface IProps extends IContextMenuProps {
     space: Room;
@@ -237,26 +238,26 @@ const SpaceContextMenu: React.FC<IProps> = ({ space, hideHeader, onFinished, ...
         openSpace(ev);
     };
 
-    const togglePinning = (ev: ButtonEvent, space: Room): void => {
-        switch (localStorage.getItem(space.roomId+"_pin")){
+    const toggleSpacePinning = (ev: ButtonEvent, space: Room): void => {
+        switch (localStorage.getItem(getSpacePinKey(space.roomId))){
             case "true":
-                localStorage.setItem(space.roomId+"_pin","false");
+                localStorage.setItem(getSpacePinKey(space.roomId),"false");
                 break;
             case "false":
             case null:
-                localStorage.setItem(space.roomId+"_pin","true");
+                localStorage.setItem(getSpacePinKey(space.roomId),"true");
                 break;
         }
     };
 
     var button_label;
     //SettingsStore.canSetValue
-    if (localStorage.getItem(space.roomId+"_pin") === "true") {button_label = "Unpin";}
+    if (localStorage.getItem(getSpacePinKey(space.roomId)) === "true") {button_label = "Unpin";}
                         else {button_label ="Pin";}
 
     const onPinClick = (ev: ButtonEvent): void => {
         PosthogTrackers.trackInteraction("WebSpaceContextMenuPinItem", ev);
-        togglePinning(ev, space);
+        toggleSpacePinning(ev, space);
     };
 
 

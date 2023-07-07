@@ -113,6 +113,10 @@ const getRoomFn: FetchRoomFn = (room: Room) => {
     return RoomNotificationStateStore.instance.getRoomState(room);
 };
 
+export const getSpacePinKey = (roomId: string): string => {
+    return `mx_space_pin_${roomId}`;
+};
+
 type SpaceStoreActions =
     | SettingUpdatedPayload
     | ViewRoomPayload
@@ -514,7 +518,7 @@ export class SpaceStoreClass extends AsyncStoreWithClient<IState> {
     };
 
     private checkSpacePinStatus = (space: Room): boolean => {
-        switch (localStorage.getItem(space.roomId+"_pin")){
+        switch (localStorage.getItem(getSpacePinKey(space.roomId))){
             case "true":
                 return true;
                 break;
