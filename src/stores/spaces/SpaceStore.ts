@@ -534,7 +534,7 @@ export class SpaceStoreClass extends AsyncStoreWithClient<IState> {
         joinedSpaces.forEach((space) => {
             this.getChildSpaces(space.roomId).forEach((subspace) => {
                 if (!this.checkSpacePinStatus(subspace)) {
-                unseenSpaces.delete(subspace);
+                    unseenSpaces.delete(subspace);
                 }
             });
         });
