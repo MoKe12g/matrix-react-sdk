@@ -513,13 +513,28 @@ export class SpaceStoreClass extends AsyncStoreWithClient<IState> {
         }
     };
 
+    private checkSpacePinStatus = (space: Room): boolean => {
+        switch (localStorage.getItem(space.roomId+"_pin")){
+            case "true":
+                return true;
+                break;
+            case "false":
+            case null:
+                return false;
+                break;
+        }
+        return false;
+    }
+
     private findRootSpaces = (joinedSpaces: Room[]): Room[] => {
         // exclude invited spaces from unseenChildren as they will be forcibly shown at the top level of the treeview
         const unseenSpaces = new Set(joinedSpaces);
 
         joinedSpaces.forEach((space) => {
             this.getChildSpaces(space.roomId).forEach((subspace) => {
+                if (!this.checkSpacePinStatus(subspace)) {
                 unseenSpaces.delete(subspace);
+                }
             });
         });
 
