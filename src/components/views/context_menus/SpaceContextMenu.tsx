@@ -40,6 +40,7 @@ import { shouldShowComponent } from "../../../customisations/helpers/UIComponent
 import { UIComponent } from "../../../settings/UIFeature";
 import PosthogTrackers from "../../../PosthogTrackers";
 import { ViewRoomPayload } from "../../../dispatcher/payloads/ViewRoomPayload";
+import { getSpacePinKey } from "../../../stores/spaces/SpaceStore";
 
 interface IProps extends IContextMenuProps {
     space?: Room;
@@ -237,6 +238,29 @@ const SpaceContextMenu: React.FC<IProps> = ({ space, hideHeader, onFinished, ...
         openSpace(ev);
     };
 
+    const toggleSpacePinning = (ev: ButtonEvent, space: Room): void => {
+        switch (localStorage.getItem(getSpacePinKey(space.roomId))){
+            case "true":
+                localStorage.setItem(getSpacePinKey(space.roomId),"false");
+                break;
+            case "false":
+            case null:
+                localStorage.setItem(getSpacePinKey(space.roomId),"true");
+                break;
+        }
+    };
+
+    var button_label;
+    //SettingsStore.canSetValue
+    if (localStorage.getItem(getSpacePinKey(space.roomId)) === "true") {button_label = "Unpin";}
+                        else {button_label ="Pin";}
+
+    const onPinClick = (ev: ButtonEvent): void => {
+        PosthogTrackers.trackInteraction("WebSpaceContextMenuPinItem", ev);
+        toggleSpacePinning(ev, space);
+    };
+
+
     return (
         <IconizedContextMenu {...props} onFinished={onFinished} className="mx_SpacePanel_contextMenu" compact>
             {!hideHeader && <div className="mx_SpacePanel_contextMenu_header">{space.name}</div>}
@@ -245,6 +269,12 @@ const SpaceContextMenu: React.FC<IProps> = ({ space, hideHeader, onFinished, ...
                     iconClassName="mx_SpacePanel_iconHome"
                     label={_t("space|context_menu|home")}
                     onClick={onHomeClick}
+                />
+                <IconizedContextMenuOption
+                    iconClassName="mx_SpacePanel_iconHome"
+                    label={_t(button_label)
+                    }
+                    onClick={onPinClick}
                 />
                 {inviteOption}
                 <IconizedContextMenuOption
