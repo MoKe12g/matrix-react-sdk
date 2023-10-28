@@ -518,15 +518,13 @@ export class SpaceStoreClass extends AsyncStoreWithClient<IState> {
         }
     };
 
-    private checkSpacePinStatus = (space: Room): boolean => {
+    private isSpacePinned = (space: Room): boolean => {
         switch (localStorage.getItem(getSpacePinKey(space.roomId))){
             case "true":
                 return true;
-                break;
             case "false":
             case null:
                 return false;
-                break;
         }
         return false;
     }
@@ -537,7 +535,7 @@ export class SpaceStoreClass extends AsyncStoreWithClient<IState> {
 
         joinedSpaces.forEach((space) => {
             this.getChildSpaces(space.roomId).forEach((subspace) => {
-                if (!this.checkSpacePinStatus(subspace)) {
+                if (!this.isSpacePinned(subspace)) {
                     unseenSpaces.delete(subspace);
                 }
             });

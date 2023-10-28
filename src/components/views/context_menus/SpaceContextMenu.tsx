@@ -250,14 +250,17 @@ const SpaceContextMenu: React.FC<IProps> = ({ space, hideHeader, onFinished, ...
         }
     };
 
-    var button_label;
-    //SettingsStore.canSetValue
-    if (localStorage.getItem(getSpacePinKey(space.roomId)) === "true") {button_label = "Unpin";}
-                        else {button_label ="Pin";}
+    const isSpacePinned = (space: Room): boolean => {
+        return localStorage.getItem(getSpacePinKey(space.roomId)) === "true";
+    }
+
+    const spacePinLabel = (isSpacePinned(space)) ? "Unpin" : "Pin";
 
     const onPinClick = (ev: ButtonEvent): void => {
         PosthogTrackers.trackInteraction("WebSpaceContextMenuPinItem", ev);
         toggleSpacePinning(ev, space);
+        // TODO: reload mx_SpacePanel
+        onFinished();
     };
 
 
@@ -272,7 +275,7 @@ const SpaceContextMenu: React.FC<IProps> = ({ space, hideHeader, onFinished, ...
                 />
                 <IconizedContextMenuOption
                     iconClassName="mx_SpacePanel_iconHome"
-                    label={_t(button_label)
+                    label={_t(spacePinLabel)
                     }
                     onClick={onPinClick}
                 />
