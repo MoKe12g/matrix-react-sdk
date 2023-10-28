@@ -240,24 +240,24 @@ const SpaceContextMenu: React.FC<IProps> = ({ space, hideHeader, onFinished, ...
 
     const toggleSpacePinning = (ev: ButtonEvent, space: Room): void => {
         switch (localStorage.getItem(getSpacePinKey(space.roomId))){
-            case "true":
-                localStorage.setItem(getSpacePinKey(space.roomId),"false");
+            case "1":
+                localStorage.setItem(getSpacePinKey(space.roomId), "0");
                 break;
-            case "false":
+            case "0":
             case null:
-                localStorage.setItem(getSpacePinKey(space.roomId),"true");
+                localStorage.setItem(getSpacePinKey(space.roomId), "1");
                 break;
         }
     };
 
     const isSpacePinned = (space: Room): boolean => {
-        return localStorage.getItem(getSpacePinKey(space.roomId)) === "true";
+        return localStorage.getItem(getSpacePinKey(space.roomId)) === "1";
     }
 
-    const spacePinLabel = (isSpacePinned(space)) ? "Unpin" : "Pin";
+    const spacePinLabel = (isSpacePinned(space)) ? "space|context_menu|unpin" : "space|context_menu|pin";
 
     const onPinClick = (ev: ButtonEvent): void => {
-        PosthogTrackers.trackInteraction("WebSpaceContextMenuPinItem", ev);
+        PosthogTrackers.trackInteraction("WebSpaceContextMenuTogglePinning", ev);
         toggleSpacePinning(ev, space);
         // TODO: reload mx_SpacePanel
         onFinished();
