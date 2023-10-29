@@ -36,7 +36,6 @@ import { leaveSpace } from "../../../utils/leave-behaviour";
 import MatrixClientContext from "../../../contexts/MatrixClientContext";
 import { ButtonEvent } from "../elements/AccessibleButton";
 import defaultDispatcher from "../../../dispatcher/dispatcher";
-import dispatcher from "../../../dispatcher/dispatcher";
 import { BetaPill } from "../beta/BetaCard";
 import SettingsStore from "../../../settings/SettingsStore";
 import { useFeatureEnabled } from "../../../hooks/useSettings";
@@ -248,12 +247,10 @@ const SpaceContextMenu: React.FC<IProps> = ({ space, hideHeader, onFinished, ...
 
     const toggleSpacePinning = (): void => {
         if (isSpacePinned){
-            // TODO: unpin Space
-            dispatcher.dispatch(RoomListActions.tagRoom(cli, space, DefaultTagID.Pinned, null,0));
+            defaultDispatcher.dispatch(RoomListActions.tagRoom(cli, space, DefaultTagID.Pinned, null,0));
         }
         else {
-            // TODO: pin Space
-            dispatcher.dispatch(RoomListActions.tagRoom(cli, space, null, DefaultTagID.Pinned,0));
+            defaultDispatcher.dispatch(RoomListActions.tagRoom(cli, space, null, DefaultTagID.Pinned,0));
         }
     };
 
