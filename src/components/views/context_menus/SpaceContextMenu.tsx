@@ -17,9 +17,13 @@ limitations under the License.
 import React, { useContext } from "react";
 import { Room, EventType, RoomType } from "matrix-js-sdk/src/matrix";
 
-import { IProps as IContextMenuProps } from "../../structures/ContextMenu";
-import IconizedContextMenu, { IconizedContextMenuOption, IconizedContextMenuOptionList } from "./IconizedContextMenu";
-import { _t } from "../../../languageHandler";
+import {IProps as IContextMenuProps} from "../../structures/ContextMenu";
+import IconizedContextMenu, {
+    IconizedContextMenuCheckbox,
+    IconizedContextMenuOption,
+    IconizedContextMenuOptionList
+} from "./IconizedContextMenu";
+import {_t} from "../../../languageHandler";
 import {
     shouldShowSpaceSettings,
     showCreateNewRoom,
@@ -32,6 +36,7 @@ import { leaveSpace } from "../../../utils/leave-behaviour";
 import MatrixClientContext from "../../../contexts/MatrixClientContext";
 import { ButtonEvent } from "../elements/AccessibleButton";
 import defaultDispatcher from "../../../dispatcher/dispatcher";
+import dispatcher from "../../../dispatcher/dispatcher";
 import { BetaPill } from "../beta/BetaCard";
 import SettingsStore from "../../../settings/SettingsStore";
 import { useFeatureEnabled } from "../../../hooks/useSettings";
@@ -40,7 +45,10 @@ import { shouldShowComponent } from "../../../customisations/helpers/UIComponent
 import { UIComponent } from "../../../settings/UIFeature";
 import PosthogTrackers from "../../../PosthogTrackers";
 import { ViewRoomPayload } from "../../../dispatcher/payloads/ViewRoomPayload";
-import { getSpacePinKey } from "../../../stores/spaces/SpaceStore";
+import { useEventEmitterState } from "../../../hooks/useEventEmitter";
+import RoomListStore, { LISTS_UPDATE_EVENT } from "../../../stores/room-list/RoomListStore";
+import { DefaultTagID } from "../../../stores/room-list/models";
+import RoomListActions from "../../../actions/RoomListActions";
 
 interface IProps extends IContextMenuProps {
     space?: Room;
@@ -238,27 +246,36 @@ const SpaceContextMenu: React.FC<IProps> = ({ space, hideHeader, onFinished, ...
         openSpace(ev);
     };
 
-    const toggleSpacePinning = (ev: ButtonEvent, space: Room): void => {
-        switch (localStorage.getItem(getSpacePinKey(space.roomId))){
-            case "1":
-                localStorage.setItem(getSpacePinKey(space.roomId), "0");
-                break;
-            case "0":
-            case null:
-                localStorage.setItem(getSpacePinKey(space.roomId), "1");
-                break;
+    const toggleSpacePinning = (): void => {
+        if (isSpacePinned){
+            // TODO: unpin Space
+            dispatcher.dispatch(RoomListActions.tagRoom(cli, space, DefaultTagID.Pinned, null,0));
+        }
+        else {
+            // TODO: pin Space
+            dispatcher.dispatch(RoomListActions.tagRoom(cli, space, null, DefaultTagID.Pinned,0));
         }
     };
 
-    const isSpacePinned = (space: Room): boolean => {
-        return localStorage.getItem(getSpacePinKey(space.roomId)) === "1";
-    }
+    const spaceTags = useEventEmitterState(RoomListStore.instance, LISTS_UPDATE_EVENT, () =>
+        RoomListStore.instance.getTagsForRoom(space),
+    );
 
-    const spacePinLabel = (isSpacePinned(space)) ? "space|context_menu|unpin" : "space|context_menu|pin";
+    const isSpacePinned = spaceTags.includes(DefaultTagID.Pinned);
+
+    // TODO: How to store data for an account on the server
+    // TODO: how to refresh space list
+    // TODO: where should the methods / constants go
+    // TODO: where / how ist cinny saving its shortcuts (pinns) (AccountData.js)
+    // TODO: Matrix Spec proposal
+    // TODO: \- is there something similar existing? How does it save data? How is its spec written? 11.20. Room Tagging
+    // there is a separate AccountData Section for every room
+    // thats how lowPriority and favorite work
+    // TODO: try to find better way to save pin status via exploring savefile
 
     const onPinClick = (ev: ButtonEvent): void => {
         PosthogTrackers.trackInteraction("WebSpaceContextMenuTogglePinning", ev);
-        toggleSpacePinning(ev, space);
+        toggleSpacePinning();
         // TODO: reload mx_SpacePanel
         onFinished();
     };
@@ -273,10 +290,10 @@ const SpaceContextMenu: React.FC<IProps> = ({ space, hideHeader, onFinished, ...
                     label={_t("space|context_menu|home")}
                     onClick={onHomeClick}
                 />
-                <IconizedContextMenuOption
+                <IconizedContextMenuCheckbox
                     iconClassName="mx_SpacePanel_iconHome"
-                    label={_t(spacePinLabel)
-                    }
+                    label={_t((isSpacePinned) ? "space|context_menu|unpin" : "space|context_menu|pin")}
+                    active={isSpacePinned}
                     onClick={onPinClick}
                 />
                 {inviteOption}

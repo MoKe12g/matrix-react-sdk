@@ -519,14 +519,7 @@ export class SpaceStoreClass extends AsyncStoreWithClient<IState> {
     };
 
     private isSpacePinned = (space: Room): boolean => {
-        switch (localStorage.getItem(getSpacePinKey(space.roomId))){
-            case "true":
-                return true;
-            case "false":
-            case null:
-                return false;
-        }
-        return false;
+        return <boolean>this.getSpaceTagOrdering(space)?.includes(DefaultTagID.Pinned);
     }
 
     private findRootSpaces = (joinedSpaces: Room[]): Room[] => {

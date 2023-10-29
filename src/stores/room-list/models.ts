@@ -23,6 +23,7 @@ export enum DefaultTagID {
     DM = "im.vector.fake.direct",
     ServerNotice = "m.server_notice",
     Suggested = "im.vector.fake.suggested",
+    Pinned = "m.space.pin", // TODO: find better tag
 }
 
 export const OrderedDefaultTagIDs = [
@@ -34,6 +35,7 @@ export const OrderedDefaultTagIDs = [
     DefaultTagID.ServerNotice,
     DefaultTagID.Suggested,
     DefaultTagID.Archived,
+    DefaultTagID.Pinned,
 ];
 
 export type TagID = string | DefaultTagID;
