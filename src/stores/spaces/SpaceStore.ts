@@ -515,7 +515,7 @@ export class SpaceStoreClass extends AsyncStoreWithClient<IState> {
     };
 
     private isSpacePinned = (space: Room): boolean => {
-        return <boolean>this.getSpaceTagOrdering(space)?.includes(DefaultTagID.Pinned);
+        return RoomListStore.instance.getTagsForRoom(space).includes(DefaultTagID.Pinned);
     }
 
     private findRootSpaces = (joinedSpaces: Room[]): Room[] => {
