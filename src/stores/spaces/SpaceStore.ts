@@ -117,10 +117,6 @@ const getRoomFn: FetchRoomFn = (room: Room) => {
     return RoomNotificationStateStore.instance.getRoomState(room);
 };
 
-export const getSpacePinKey = (roomId: string): string => {
-    return `mx_space_pin_${roomId}`;
-};
-
 type SpaceStoreActions =
     | SettingUpdatedPayload
     | ViewRoomPayload
